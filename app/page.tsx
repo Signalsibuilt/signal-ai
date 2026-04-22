@@ -63,10 +63,11 @@ export default function Home() {
 
         {/* HEADER */}
         <div className="text-center space-y-3">
-          <h1 className="text-5xl font-bold">
-            Signal AI
-          </h1>
+          <h1 className="text-5xl font-bold">Signal AI</h1>
           <p className="text-zinc-400 text-lg">
+            AI marketing tool for local businesses
+          </p>
+          <p className="text-sm text-zinc-400">
             Turn your ideas into <span className="text-white font-semibold">sales-driving promos</span> in seconds
           </p>
         </div>
@@ -79,6 +80,11 @@ export default function Home() {
             src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df"
             className="rounded-xl h-44 w-full object-cover opacity-80"
           />
+
+          {/* USE CASE TEXT */}
+          <p className="text-sm text-zinc-400 text-center">
+            Perfect for Instagram posts, WhatsApp promotions, and daily offers
+          </p>
 
           {/* MODES */}
           <div className="flex gap-2 justify-center flex-wrap">
@@ -124,7 +130,7 @@ export default function Home() {
               ref={imageRef}
               className="bg-white text-black rounded-2xl p-6 space-y-4 shadow-2xl"
             >
-              <h2 className="text-xl font-bold">🔥 Promo Pack</h2>
+              <h2 className="text-xl font-bold">🔥 Ready-to-Post Promos</h2>
 
               {results.map((text, i) => (
                 <div key={i} className="p-3 bg-zinc-100 rounded-lg">
