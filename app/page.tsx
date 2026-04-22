@@ -1,182 +1,164 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
 
 export default function Home() {
-  const [business, setBusiness] = useState('');
   const [prompt, setPrompt] = useState('');
   const [results, setResults] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState('general');
-  const [tone, setTone] = useState('exciting');
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [mode, setMode] = useState('');
   const imageRef = useRef<HTMLDivElement>(null);
 
-  // 🔥 Load saved data
-  useEffect(() => {
-    const savedBusiness = localStorage.getItem('business');
-    if (savedBusiness) setBusiness(savedBusiness);
-  }, []);
-
-  // 🔥 Save business
-  useEffect(() => {
-    if (business) {
-      localStorage.setItem('business', business);
-    }
-  }, [business]);
-
-  // 🔥 Load promos per business
-  useEffect(() => {
-    if (business) {
-      const saved = localStorage.getItem(`promos_${business}`);
-      if (saved) setResults(JSON.parse(saved));
-    }
-  }, [business]);
-
   const generate = async () => {
-    if (!prompt || !business) return;
+    if (!prompt) return;
 
     setLoading(true);
+    setResults([]);
 
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt: `${mode} promotion: ${prompt}`,
+        }),
       });
 
       const data = await res.json();
 
-      let base = prompt;
-
-      if (mode === 'restaurant') base = `Delicious food alert! ${prompt}`;
-      if (mode === 'barber') base = `Fresh cuts available! ${prompt}`;
-      if (mode === 'clothing') base = `New drip just dropped! ${prompt}`;
-      if (mode === 'gym') base = `Push your limits! ${prompt}`;
-
-      let styled = base;
-
-      if (tone === 'luxury') styled = `✨ Premium: ${base}`;
-      if (tone === 'funny') styled = `😂 Don’t miss this: ${base}`;
-      if (tone === 'urgent') styled = `⏳ LAST CHANCE! ${base}`;
-
-      const newPromos = [
+      const variations = [
         data.result,
-        `🔥 ${styled}`,
-        `🚀 ${styled.toUpperCase()}`,
+        `🔥 Limited Deal: ${prompt}! Only today!`,
+        `🚀 ${prompt.toUpperCase()} — Don’t miss out!`,
       ];
 
-      setResults(newPromos);
-
-      // 🔥 Save per business
-      localStorage.setItem(
-        `promos_${business}`,
-        JSON.stringify(newPromos)
-      );
-
+      setResults(variations);
     } catch {
-      setResults(['Error generating promo']);
+      setResults(['Something went wrong']);
     }
 
     setLoading(false);
   };
 
-  const copy = (text: string) => {
+  const copy = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
-    alert('Copied!');
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
   };
 
   const downloadImage = async () => {
     if (!imageRef.current) return;
+
     const dataUrl = await htmlToImage.toPng(imageRef.current);
 
     const link = document.createElement('a');
-    link.download = 'promo.png';
+    link.download = 'signal-ai-promo.png';
     link.href = dataUrl;
     link.click();
   };
 
   return (
-    <main className="min-h-screen bg-black text-white p-6 flex justify-center">
-      <div className="w-full max-w-2xl space-y-6">
+    <main className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white flex items-center justify-center p-6">
+      <div className="w-full max-w-2xl space-y-8">
 
-        <h1 className="text-4xl font-bold text-center">Signal AI</h1>
+        {/* HEADER */}
+        <div className="text-center space-y-3">
+          <h1 className="text-5xl font-bold">
+            Signal AI
+          </h1>
+          <p className="text-zinc-400 text-lg">
+            Turn your ideas into <span className="text-white font-semibold">sales-driving promos</span> in seconds
+          </p>
+        </div>
 
-        {/* BUSINESS NAME */}
-        <input
-          placeholder="Business name (e.g. Joe’s Barbershop)"
-          value={business}
-          onChange={(e) => setBusiness(e.target.value)}
-          className="w-full p-3 bg-zinc-900 rounded-xl"
-        />
+        {/* CARD */}
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 space-y-6 shadow-xl">
 
-        {/* MODE */}
-        <select
-          value={mode}
-          onChange={(e) => setMode(e.target.value)}
-          className="w-full p-3 bg-zinc-900 rounded-xl"
-        >
-          <option value="general">General</option>
-          <option value="restaurant">Restaurant</option>
-          <option value="barber">Barber</option>
-          <option value="clothing">Clothing</option>
-          <option value="gym">Gym</option>
-        </select>
+          {/* IMAGE */}
+          <img
+            src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df"
+            className="rounded-xl h-44 w-full object-cover opacity-80"
+          />
 
-        {/* TONE */}
-        <select
-          value={tone}
-          onChange={(e) => setTone(e.target.value)}
-          className="w-full p-3 bg-zinc-900 rounded-xl"
-        >
-          <option value="exciting">Exciting</option>
-          <option value="luxury">Luxury</option>
-          <option value="funny">Funny</option>
-          <option value="urgent">Urgent</option>
-        </select>
+          {/* MODES */}
+          <div className="flex gap-2 justify-center flex-wrap">
+            {['🍔 Food', '👕 Clothing', '💈 Barber'].map((m) => (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={`px-4 py-2 rounded-full text-sm transition ${
+                  mode === m
+                    ? 'bg-white text-black'
+                    : 'bg-white/10 hover:bg-white/20'
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
 
-        {/* PROMPT */}
-        <input
-          placeholder="e.g. haircut special today"
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          className="w-full p-4 bg-zinc-900 rounded-xl"
-        />
+          {/* INPUT */}
+          <input
+            className="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-white/40 transition"
+            placeholder="e.g. burger special tonight"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+          />
 
-        <button
-          onClick={generate}
-          className="w-full p-4 bg-white text-black rounded-xl"
-        >
-          {loading ? 'Generating...' : 'Generate'}
-        </button>
+          {/* BUTTON */}
+          <button
+            onClick={generate}
+            className="w-full p-4 rounded-xl bg-white text-black font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+          >
+            {loading ? 'Generating...' : 'Generate Promos'}
+          </button>
 
+        </div>
+
+        {/* RESULTS */}
         {results.length > 0 && (
-          <>
-            <div ref={imageRef} className="bg-white text-black p-4 rounded-xl">
-              {results.map((r, i) => (
-                <p key={i}>{r}</p>
+          <div className="space-y-6">
+
+            {/* PREVIEW CARD */}
+            <div
+              ref={imageRef}
+              className="bg-white text-black rounded-2xl p-6 space-y-4 shadow-2xl"
+            >
+              <h2 className="text-xl font-bold">🔥 Promo Pack</h2>
+
+              {results.map((text, i) => (
+                <div key={i} className="p-3 bg-zinc-100 rounded-lg">
+                  <p>{text}</p>
+                </div>
               ))}
-              <p className="text-xs text-center mt-2">
-  {business} • Powered by Signal AI
-</p>
+
+              <p className="text-xs text-center opacity-50">
+                Powered by Signal AI
+              </p>
             </div>
 
-            {results.map((r, i) => (
+            {/* COPY BUTTONS */}
+            {results.map((text, i) => (
               <button
                 key={i}
-                onClick={() => copy(r)}
-                className="w-full p-2 bg-green-500 rounded"
+                onClick={() => copy(text, i)}
+                className="w-full p-3 rounded-xl bg-green-500 text-black font-semibold hover:scale-[1.02] transition"
               >
-                Copy Promo
+                {copiedIndex === i ? 'Copied ✅' : `Copy Promo ${i + 1}`}
               </button>
             ))}
 
+            {/* DOWNLOAD */}
             <button
               onClick={downloadImage}
-              className="w-full p-3 bg-blue-500 rounded"
+              className="w-full p-4 rounded-xl bg-blue-500 text-white font-semibold hover:scale-[1.02] transition"
             >
-              Download Image
+              Download Promo Image
             </button>
-          </>
+
+          </div>
         )}
+
       </div>
     </main>
   );
