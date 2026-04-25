@@ -87,33 +87,35 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl space-y-8">
+      <div className="w-full max-w-2xl space-y-8 animate-fade-in">
 
         {/* HEADER */}
         <div className="text-center space-y-3">
-          <h1 className="text-5xl font-bold tracking-tight">
+          <h1 className="text-5xl font-bold tracking-tight animate-pulse">
             Signal <span className="text-green-400">AI</span>
           </h1>
-          <p className="text-zinc-400">AI marketing tool for local businesses</p>
-          <p className="text-sm text-zinc-500">
-            Create high-converting promos for WhatsApp & Instagram
-          </p>
+          <p className="text-zinc-400">Turn simple ideas into customer-grabbing promos</p>
           <p className="text-xs text-green-400">
-            Helping local businesses create promos in seconds 🚀
+            Helping local businesses get more customers 🚀
           </p>
         </div>
 
         {/* CARD */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 space-y-6 shadow-2xl">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 space-y-6 shadow-2xl hover:scale-[1.01] transition">
 
           <img
             src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df"
             className="rounded-xl h-44 w-full object-cover opacity-80"
           />
 
+          {/* EXAMPLE */}
+          <p className="text-sm text-yellow-400 text-center animate-pulse">
+            ⚡ Example: “2-for-1 burgers tonight after 6pm”
+          </p>
+
           {/* BUSINESS */}
           <input
-            className="w-full p-4 rounded-xl bg-black/40 border border-white/10"
+            className="w-full p-4 rounded-xl bg-black/40 border border-white/10 focus:border-green-400 transition"
             placeholder="Business name (e.g. Craft Café)"
             value={business}
             onChange={(e) => setBusiness(e.target.value)}
@@ -125,8 +127,10 @@ export default function Home() {
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`px-4 py-2 rounded-full text-sm ${
-                  mode === m ? 'bg-white text-black' : 'bg-white/10'
+                className={`px-4 py-2 rounded-full text-sm transition ${
+                  mode === m
+                    ? 'bg-white text-black scale-105'
+                    : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
                 {m}
@@ -140,8 +144,10 @@ export default function Home() {
               <button
                 key={t}
                 onClick={() => setTone(t)}
-                className={`px-4 py-2 rounded-full text-sm ${
-                  tone === t ? 'bg-white text-black' : 'bg-white/10'
+                className={`px-4 py-2 rounded-full text-sm transition ${
+                  tone === t
+                    ? 'bg-white text-black scale-105'
+                    : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
                 {t}
@@ -151,7 +157,7 @@ export default function Home() {
 
           {/* INPUT */}
           <input
-            className="w-full p-4 rounded-xl bg-black/40 border border-white/10"
+            className="w-full p-4 rounded-xl bg-black/40 border border-white/10 focus:border-green-400 transition"
             placeholder="e.g. burger special tonight"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -160,29 +166,29 @@ export default function Home() {
           {/* IDEA BUTTON */}
           <button
             onClick={generateIdea}
-            className="w-full p-2 text-sm text-zinc-400 hover:text-white"
+            className="w-full p-2 text-sm text-zinc-400 hover:text-white transition"
           >
             Generate idea for me ✨
           </button>
 
-          {/* GENERATE */}
+          {/* CTA */}
           <button
             onClick={generate}
             disabled={!prompt}
-            className="w-full p-4 rounded-xl bg-green-400 text-black font-bold text-lg disabled:opacity-50"
+            className="w-full p-4 rounded-xl bg-green-400 text-black font-bold text-lg hover:scale-[1.03] active:scale-[0.98] transition disabled:opacity-50"
           >
-            {loading ? 'Generating...' : 'Generate High-Converting Promos'}
+            {loading ? 'Generating...' : 'Get Customers Now 🚀'}
           </button>
 
         </div>
 
         {/* RESULTS */}
         {results.length > 0 && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-fade-in">
 
             <div
               ref={imageRef}
-              className="bg-white text-black rounded-2xl p-6 space-y-4 shadow-2xl"
+              className="bg-white text-black rounded-2xl p-6 space-y-4 shadow-2xl animate-slide-up"
             >
               <div className="text-center space-y-2">
                 <h2 className="text-2xl font-bold">{business || 'Your Business'}</h2>
@@ -192,7 +198,7 @@ export default function Home() {
               </div>
 
               {results.map((text, i) => (
-                <div key={i} className="p-4 bg-white rounded-xl shadow-md space-y-2">
+                <div key={i} className="p-4 bg-white rounded-xl shadow-md space-y-2 hover:scale-[1.02] transition">
                   <p className="text-lg font-semibold">{text}</p>
                   <p className="text-sm text-zinc-500">Limited time offer</p>
                 </div>
@@ -203,15 +209,13 @@ export default function Home() {
               </p>
             </div>
 
-            {/* COPY ALL */}
             <button
               onClick={copyAll}
-              className="w-full p-3 rounded-xl bg-purple-500 text-white font-semibold"
+              className="w-full p-3 rounded-xl bg-purple-500 text-white font-semibold hover:scale-[1.02] transition"
             >
               Copy All Promos
             </button>
 
-            {/* ACTIONS */}
             {results.map((text, i) => (
               <div key={i} className="flex gap-2">
                 <button
@@ -230,18 +234,16 @@ export default function Home() {
               </div>
             ))}
 
-            {/* INSTAGRAM */}
             <button
               onClick={() => shareInstagram(results[0])}
-              className="w-full p-4 rounded-xl bg-pink-500 text-white font-semibold"
+              className="w-full p-4 rounded-xl bg-pink-500 text-white font-semibold hover:scale-[1.02] transition"
             >
               Open Instagram & Paste 📸
             </button>
 
-            {/* DOWNLOAD */}
             <button
               onClick={downloadImage}
-              className="w-full p-4 rounded-xl bg-blue-500 text-white font-semibold"
+              className="w-full p-4 rounded-xl bg-blue-500 text-white font-semibold hover:scale-[1.02] transition"
             >
               Download Promo Image
             </button>
@@ -250,6 +252,24 @@ export default function Home() {
         )}
 
       </div>
+
+      {/* ANIMATIONS */}
+      <style jsx>{`
+        .animate-fade-in {
+          animation: fadeIn 0.8s ease forwards;
+        }
+        .animate-slide-up {
+          animation: slideUp 0.6s ease forwards;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </main>
   );
 }
