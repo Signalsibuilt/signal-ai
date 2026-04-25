@@ -4,6 +4,8 @@ import * as htmlToImage from 'html-to-image';
 
 export default function Home() {
   const [prompt, setPrompt] = useState('');
+  const [business, setBusiness] = useState('');
+  const [tone, setTone] = useState('🔥 Hype');
   const [results, setResults] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -20,7 +22,7 @@ export default function Home() {
       const res = await fetch('/api/generate', {
         method: 'POST',
         body: JSON.stringify({
-          prompt: `${mode} promotion: ${prompt}`,
+          prompt: `${business} - ${mode} promotion in a ${tone} tone: ${prompt}`,
         }),
       });
 
@@ -28,7 +30,7 @@ export default function Home() {
 
       const variations = [
         data.result,
-        `🔥 Limited Deal: ${prompt}! Only today!`,
+        `🔥 ${business} Special: ${prompt}! Limited time!`,
         `🚀 ${prompt.toUpperCase()} — Don’t miss out!`,
       ];
 
@@ -46,6 +48,10 @@ export default function Home() {
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
+  const copyAll = () => {
+    navigator.clipboard.writeText(results.join('\n\n'));
+  };
+
   const downloadImage = async () => {
     if (!imageRef.current) return;
 
@@ -57,8 +63,24 @@ export default function Home() {
   };
 
   const shareWhatsApp = (text: string) => {
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    const message = `${text}\n\nCreated with Signal AI`;
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
+  };
+
+  // Instagram doesn't allow direct text sharing like WhatsApp
+  // So we guide user to copy + open IG
+  const shareInstagram = async () => {
+    if (!imageRef.current) return;
+
+    const dataUrl = await htmlToImage.toPng(imageRef.current);
+
+    const link = document.createElement('a');
+    link.download = 'promo-for-instagram.png';
+    link.href = dataUrl;
+    link.click();
+
+    alert('Image downloaded! Upload it to Instagram and paste your promo caption 🚀');
   };
 
   return (
@@ -86,6 +108,14 @@ export default function Home() {
             className="rounded-xl h-44 w-full object-cover opacity-80"
           />
 
+          {/* BUSINESS NAME */}
+          <input
+            className="w-full p-4 rounded-xl bg-black/40 border border-white/10"
+            placeholder="Business name (e.g. Craft Café)"
+            value={business}
+            onChange={(e) => setBusiness(e.target.value)}
+          />
+
           {/* MODES */}
           <div className="flex gap-2 justify-center flex-wrap">
             {['🍔 Food', '👕 Clothing', '💈 Barber'].map((m) => (
@@ -103,18 +133,33 @@ export default function Home() {
             ))}
           </div>
 
+          {/* TONE */}
+          <div className="flex gap-2 justify-center flex-wrap">
+            {['🔥 Hype', '💎 Premium', '😊 Friendly'].map((t) => (
+              <button
+                key={t}
+                onClick={() => setTone(t)}
+                className={`px-4 py-2 rounded-full text-sm ${
+                  tone === t ? 'bg-white text-black' : 'bg-white/10'
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
           {/* INPUT */}
           <input
-            className="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-white/40 transition"
+            className="w-full p-4 rounded-xl bg-black/40 border border-white/10"
             placeholder="e.g. burger special tonight"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
           />
 
-          {/* CTA BUTTON */}
+          {/* CTA */}
           <button
             onClick={generate}
-            className="w-full p-4 rounded-xl bg-green-400 text-black font-bold text-lg transition-all hover:scale-[1.03] active:scale-[0.98]"
+            className="w-full p-4 rounded-xl bg-green-400 text-black font-bold text-lg hover:scale-[1.03]"
           >
             {loading ? 'Generating...' : 'Generate High-Converting Promos'}
           </button>
@@ -125,7 +170,6 @@ export default function Home() {
         {results.length > 0 && (
           <div className="space-y-6">
 
-            {/* PREVIEW */}
             <div
               ref={imageRef}
               className="bg-gradient-to-br from-white to-zinc-200 text-black rounded-2xl p-6 space-y-4 shadow-2xl"
@@ -139,33 +183,49 @@ export default function Home() {
               ))}
 
               <p className="text-xs text-center opacity-50">
-                Powered by Signal AI
+                {business || 'Your Business'} • Powered by Signal AI
               </p>
             </div>
+
+            {/* COPY ALL */}
+            <button
+              onClick={copyAll}
+              className="w-full p-3 rounded-xl bg-purple-500 text-white font-semibold"
+            >
+              Copy All Promos
+            </button>
 
             {/* ACTION BUTTONS */}
             {results.map((text, i) => (
               <div key={i} className="flex gap-2">
                 <button
                   onClick={() => copy(text, i)}
-                  className="flex-1 p-3 rounded-xl bg-green-500 text-black font-semibold hover:scale-[1.02] transition"
+                  className="flex-1 p-3 rounded-xl bg-green-500 text-black font-semibold"
                 >
                   {copiedIndex === i ? 'Copied ✅' : `Copy ${i + 1}`}
                 </button>
 
                 <button
                   onClick={() => shareWhatsApp(text)}
-                  className="flex-1 p-3 rounded-xl bg-green-600 text-white font-semibold hover:scale-[1.02] transition"
+                  className="flex-1 p-3 rounded-xl bg-green-600 text-white font-semibold"
                 >
                   WhatsApp 📲
                 </button>
               </div>
             ))}
 
+            {/* INSTAGRAM */}
+            <button
+              onClick={shareInstagram}
+              className="w-full p-4 rounded-xl bg-pink-500 text-white font-semibold"
+            >
+              Download for Instagram 📸
+            </button>
+
             {/* DOWNLOAD */}
             <button
               onClick={downloadImage}
-              className="w-full p-4 rounded-xl bg-blue-500 text-white font-semibold hover:scale-[1.02] transition"
+              className="w-full p-4 rounded-xl bg-blue-500 text-white font-semibold"
             >
               Download Promo Image
             </button>
