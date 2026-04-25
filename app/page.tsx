@@ -1,6 +1,11 @@
 'use client';
+
 import { useState, useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
+import { motion } from 'framer-motion';
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
   const [prompt, setPrompt] = useState('');
@@ -82,40 +87,44 @@ export default function Home() {
   const shareInstagram = (text: string) => {
     navigator.clipboard.writeText(text);
     window.open('https://www.instagram.com/', '_blank');
-    alert('Caption copied! Paste it into Instagram 🚀');
   };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl space-y-8 animate-fade-in">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-2xl space-y-8"
+      >
 
         {/* HEADER */}
         <div className="text-center space-y-3">
-          <h1 className="text-5xl font-bold tracking-tight animate-pulse">
+          <h1 className="text-5xl font-bold tracking-tight">
             Signal <span className="text-green-400">AI</span>
           </h1>
-          <p className="text-zinc-400">Turn simple ideas into customer-grabbing promos</p>
+          <p className="text-zinc-400">Turn ideas into customer-grabbing promos</p>
           <p className="text-xs text-green-400">
-            Helping local businesses get more customers 🚀
+            Built for local businesses 🚀
           </p>
         </div>
 
         {/* CARD */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 space-y-6 shadow-2xl hover:scale-[1.01] transition">
+        <motion.div
+          whileHover={{ scale: 1.01 }}
+          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 space-y-6 shadow-2xl"
+        >
 
           <img
             src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df"
             className="rounded-xl h-44 w-full object-cover opacity-80"
           />
 
-          {/* EXAMPLE */}
-          <p className="text-sm text-yellow-400 text-center animate-pulse">
+          <p className="text-sm text-yellow-400 text-center">
             ⚡ Example: “2-for-1 burgers tonight after 6pm”
           </p>
 
           {/* BUSINESS */}
-          <input
-            className="w-full p-4 rounded-xl bg-black/40 border border-white/10 focus:border-green-400 transition"
+          <Input
             placeholder="Business name (e.g. Craft Café)"
             value={business}
             onChange={(e) => setBusiness(e.target.value)}
@@ -124,152 +133,101 @@ export default function Home() {
           {/* MODES */}
           <div className="flex gap-2 justify-center flex-wrap">
             {['🍔 Food', '👕 Clothing', '💈 Barber'].map((m) => (
-              <button
+              <Button
                 key={m}
+                variant={mode === m ? "default" : "outline"}
                 onClick={() => setMode(m)}
-                className={`px-4 py-2 rounded-full text-sm transition ${
-                  mode === m
-                    ? 'bg-white text-black scale-105'
-                    : 'bg-white/10 hover:bg-white/20'
-                }`}
               >
                 {m}
-              </button>
+              </Button>
             ))}
           </div>
 
           {/* TONE */}
           <div className="flex gap-2 justify-center flex-wrap">
             {['🔥 Hype', '💎 Premium', '😊 Friendly'].map((t) => (
-              <button
+              <Button
                 key={t}
+                variant={tone === t ? "default" : "outline"}
                 onClick={() => setTone(t)}
-                className={`px-4 py-2 rounded-full text-sm transition ${
-                  tone === t
-                    ? 'bg-white text-black scale-105'
-                    : 'bg-white/10 hover:bg-white/20'
-                }`}
               >
                 {t}
-              </button>
+              </Button>
             ))}
           </div>
 
           {/* INPUT */}
-          <input
-            className="w-full p-4 rounded-xl bg-black/40 border border-white/10 focus:border-green-400 transition"
+          <Input
             placeholder="e.g. burger special tonight"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
           />
 
-          {/* IDEA BUTTON */}
-          <button
-            onClick={generateIdea}
-            className="w-full p-2 text-sm text-zinc-400 hover:text-white transition"
-          >
-            Generate idea for me ✨
-          </button>
+          {/* IDEA */}
+          <Button variant="ghost" onClick={generateIdea}>
+            Generate idea ✨
+          </Button>
 
           {/* CTA */}
-          <button
+          <Button
             onClick={generate}
             disabled={!prompt}
-            className="w-full p-4 rounded-xl bg-green-400 text-black font-bold text-lg hover:scale-[1.03] active:scale-[0.98] transition disabled:opacity-50"
+            className="w-full text-lg font-bold"
           >
             {loading ? 'Generating...' : 'Get Customers Now 🚀'}
-          </button>
+          </Button>
 
-        </div>
+        </motion.div>
 
         {/* RESULTS */}
         {results.length > 0 && (
-          <div className="space-y-6 animate-fade-in">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
 
             <div
               ref={imageRef}
-              className="bg-white text-black rounded-2xl p-6 space-y-4 shadow-2xl animate-slide-up"
+              className="bg-white text-black rounded-2xl p-6 space-y-4 shadow-2xl"
             >
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold">{business || 'Your Business'}</h2>
-                <p className="text-sm uppercase tracking-widest text-zinc-500">
-                  {mode} Special
-                </p>
-              </div>
+              <h2 className="text-xl font-bold text-center">
+                {business || 'Your Business'}
+              </h2>
 
               {results.map((text, i) => (
-                <div key={i} className="p-4 bg-white rounded-xl shadow-md space-y-2 hover:scale-[1.02] transition">
-                  <p className="text-lg font-semibold">{text}</p>
-                  <p className="text-sm text-zinc-500">Limited time offer</p>
+                <div key={i} className="p-4 bg-white rounded-xl shadow-md">
+                  <p>{text}</p>
                 </div>
               ))}
-
-              <p className="text-xs text-center opacity-50">
-                {business || 'Your Business'} • Signal AI
-              </p>
             </div>
 
-            <button
-              onClick={copyAll}
-              className="w-full p-3 rounded-xl bg-purple-500 text-white font-semibold hover:scale-[1.02] transition"
-            >
-              Copy All Promos
-            </button>
+            <Button onClick={copyAll}>Copy All</Button>
 
             {results.map((text, i) => (
               <div key={i} className="flex gap-2">
-                <button
-                  onClick={() => copy(text, i)}
-                  className="flex-1 p-3 rounded-xl bg-green-500 text-black font-semibold"
-                >
+                <Button onClick={() => copy(text, i)}>
                   {copiedIndex === i ? 'Copied ✅' : `Copy ${i + 1}`}
-                </button>
+                </Button>
 
-                <button
-                  onClick={() => shareWhatsApp(text)}
-                  className="flex-1 p-3 rounded-xl bg-green-600 text-white font-semibold"
-                >
+                <Button onClick={() => shareWhatsApp(text)}>
                   WhatsApp 📲
-                </button>
+                </Button>
               </div>
             ))}
 
-            <button
-              onClick={() => shareInstagram(results[0])}
-              className="w-full p-4 rounded-xl bg-pink-500 text-white font-semibold hover:scale-[1.02] transition"
-            >
-              Open Instagram & Paste 📸
-            </button>
+            <Button onClick={() => shareInstagram(results[0])}>
+              Open Instagram 📸
+            </Button>
 
-            <button
-              onClick={downloadImage}
-              className="w-full p-4 rounded-xl bg-blue-500 text-white font-semibold hover:scale-[1.02] transition"
-            >
-              Download Promo Image
-            </button>
+            <Button onClick={downloadImage}>
+              Download Image
+            </Button>
 
-          </div>
+          </motion.div>
         )}
 
-      </div>
-
-      {/* ANIMATIONS */}
-      <style jsx>{`
-        .animate-fade-in {
-          animation: fadeIn 0.8s ease forwards;
-        }
-        .animate-slide-up {
-          animation: slideUp 0.6s ease forwards;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+      </motion.div>
     </main>
   );
 }
