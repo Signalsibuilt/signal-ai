@@ -68,19 +68,10 @@ export default function Home() {
     window.open(url, '_blank');
   };
 
-  // Instagram doesn't allow direct text sharing like WhatsApp
-  // So we guide user to copy + open IG
-  const shareInstagram = async () => {
-    if (!imageRef.current) return;
-
-    const dataUrl = await htmlToImage.toPng(imageRef.current);
-
-    const link = document.createElement('a');
-    link.download = 'promo-for-instagram.png';
-    link.href = dataUrl;
-    link.click();
-
-    alert('Image downloaded! Upload it to Instagram and paste your promo caption 🚀');
+  const shareInstagram = (text: string) => {
+    navigator.clipboard.writeText(text);
+    window.open('https://www.instagram.com/', '_blank');
+    alert('Caption copied! Paste it into Instagram 🚀');
   };
 
   return (
@@ -108,7 +99,7 @@ export default function Home() {
             className="rounded-xl h-44 w-full object-cover opacity-80"
           />
 
-          {/* BUSINESS NAME */}
+          {/* BUSINESS */}
           <input
             className="w-full p-4 rounded-xl bg-black/40 border border-white/10"
             placeholder="Business name (e.g. Craft Café)"
@@ -122,10 +113,8 @@ export default function Home() {
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`px-4 py-2 rounded-full text-sm transition ${
-                  mode === m
-                    ? 'bg-white text-black'
-                    : 'bg-white/10 hover:bg-white/20'
+                className={`px-4 py-2 rounded-full text-sm ${
+                  mode === m ? 'bg-white text-black' : 'bg-white/10'
                 }`}
               >
                 {m}
@@ -156,10 +145,10 @@ export default function Home() {
             onChange={(e) => setPrompt(e.target.value)}
           />
 
-          {/* CTA */}
+          {/* BUTTON */}
           <button
             onClick={generate}
-            className="w-full p-4 rounded-xl bg-green-400 text-black font-bold text-lg hover:scale-[1.03]"
+            className="w-full p-4 rounded-xl bg-green-400 text-black font-bold text-lg"
           >
             {loading ? 'Generating...' : 'Generate High-Converting Promos'}
           </button>
@@ -172,18 +161,18 @@ export default function Home() {
 
             <div
               ref={imageRef}
-              className="bg-gradient-to-br from-white to-zinc-200 text-black rounded-2xl p-6 space-y-4 shadow-2xl"
+              className="bg-white text-black rounded-2xl p-6 space-y-4 shadow-2xl"
             >
               <h2 className="text-xl font-bold">🔥 Ready-to-Post Promos</h2>
 
               {results.map((text, i) => (
-                <div key={i} className="p-3 bg-white rounded-lg shadow">
+                <div key={i} className="p-3 bg-zinc-100 rounded-lg">
                   <p>{text}</p>
                 </div>
               ))}
 
               <p className="text-xs text-center opacity-50">
-                {business || 'Your Business'} • Powered by Signal AI
+                {business || 'Your Business'} • Signal AI
               </p>
             </div>
 
@@ -195,7 +184,7 @@ export default function Home() {
               Copy All Promos
             </button>
 
-            {/* ACTION BUTTONS */}
+            {/* ACTIONS */}
             {results.map((text, i) => (
               <div key={i} className="flex gap-2">
                 <button
@@ -216,10 +205,10 @@ export default function Home() {
 
             {/* INSTAGRAM */}
             <button
-              onClick={shareInstagram}
+              onClick={() => shareInstagram(results[0])}
               className="w-full p-4 rounded-xl bg-pink-500 text-white font-semibold"
             >
-              Download for Instagram 📸
+              Open Instagram & Paste 📸
             </button>
 
             {/* DOWNLOAD */}
