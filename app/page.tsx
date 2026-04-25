@@ -42,6 +42,18 @@ export default function Home() {
     setLoading(false);
   };
 
+  const generateIdea = () => {
+    const ideas = [
+      '2-for-1 deal this weekend',
+      'Happy hour special after 6pm',
+      'Limited time discount on best sellers',
+      'Weekend special with free drink',
+      'Flash sale today only',
+    ];
+    const random = ideas[Math.floor(Math.random() * ideas.length)];
+    setPrompt(random);
+  };
+
   const copy = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
@@ -54,7 +66,6 @@ export default function Home() {
 
   const downloadImage = async () => {
     if (!imageRef.current) return;
-
     const dataUrl = await htmlToImage.toPng(imageRef.current);
     const link = document.createElement('a');
     link.download = 'signal-ai-promo.png';
@@ -83,11 +94,12 @@ export default function Home() {
           <h1 className="text-5xl font-bold tracking-tight">
             Signal <span className="text-green-400">AI</span>
           </h1>
-          <p className="text-zinc-400">
-            AI marketing tool for local businesses
-          </p>
+          <p className="text-zinc-400">AI marketing tool for local businesses</p>
           <p className="text-sm text-zinc-500">
-            Create high-converting promos for WhatsApp, Instagram & daily offers
+            Create high-converting promos for WhatsApp & Instagram
+          </p>
+          <p className="text-xs text-green-400">
+            Helping local businesses create promos in seconds 🚀
           </p>
         </div>
 
@@ -145,10 +157,19 @@ export default function Home() {
             onChange={(e) => setPrompt(e.target.value)}
           />
 
-          {/* BUTTON */}
+          {/* IDEA BUTTON */}
+          <button
+            onClick={generateIdea}
+            className="w-full p-2 text-sm text-zinc-400 hover:text-white"
+          >
+            Generate idea for me ✨
+          </button>
+
+          {/* GENERATE */}
           <button
             onClick={generate}
-            className="w-full p-4 rounded-xl bg-green-400 text-black font-bold text-lg"
+            disabled={!prompt}
+            className="w-full p-4 rounded-xl bg-green-400 text-black font-bold text-lg disabled:opacity-50"
           >
             {loading ? 'Generating...' : 'Generate High-Converting Promos'}
           </button>
@@ -163,11 +184,17 @@ export default function Home() {
               ref={imageRef}
               className="bg-white text-black rounded-2xl p-6 space-y-4 shadow-2xl"
             >
-              <h2 className="text-xl font-bold">🔥 Ready-to-Post Promos</h2>
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-bold">{business || 'Your Business'}</h2>
+                <p className="text-sm uppercase tracking-widest text-zinc-500">
+                  {mode} Special
+                </p>
+              </div>
 
               {results.map((text, i) => (
-                <div key={i} className="p-3 bg-zinc-100 rounded-lg">
-                  <p>{text}</p>
+                <div key={i} className="p-4 bg-white rounded-xl shadow-md space-y-2">
+                  <p className="text-lg font-semibold">{text}</p>
+                  <p className="text-sm text-zinc-500">Limited time offer</p>
                 </div>
               ))}
 
